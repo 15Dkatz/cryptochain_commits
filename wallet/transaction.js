@@ -27,7 +27,15 @@ class Transaction {
   }
 
   update({ senderWallet, recipient, amount }) {
-    this.outputMap[recipient] = amount;
+    if (amount > this.outputMap[senderWallet.publicKey]) {
+      throw new Error('Amount exceeds balance');
+    }
+
+    if (!this.outputMap[recipient]) {
+      this.outputMap[recipient] = amount;
+    } else {
+      this.outputMap[recipient] = this.outputMap[recipient] + amount;
+    }
 
     this.outputMap[senderWallet.publicKey] =
       this.outputMap[senderWallet.publicKey] - amount;
